@@ -10,9 +10,8 @@ function App() {
   useEffect(() => {
     WebViewer(
       {
-        path: 'lib',
-        initialDoc: 'lib/webviewer-demo.pdf'
-        // pdf downloaded from: 'https://pdftron.s3.amazonaws.com/downloads/pl/webviewer-demo.pdf'
+        path: 'lib',                            // make sure to have core and ui folder moved to public/lib from node_modules/@pdftron
+        initialDoc: 'lib/webviewer-demo.pdf'    // pdf downloaded from: 'https://pdftron.s3.amazonaws.com/downloads/pl/webviewer-demo.pdf'
       },
       viewer.current as HTMLDivElement).then((instance) => {
       const { documentViewer, annotationManager, Annotations } = instance.Core;
@@ -34,7 +33,7 @@ function App() {
               method: 'POST',
               body: export_xfdf // written to a database in the server
             });
-            
+
           }
         });
       });
