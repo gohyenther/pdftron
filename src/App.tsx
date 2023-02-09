@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import WebViewer from '@pdftron/webviewer';
 import './App.css';
+import { parseJsonText } from 'typescript';
 
 
 function App() {
@@ -15,6 +16,9 @@ function App() {
       },
       viewer.current as HTMLDivElement).then((instance) => {
       const { documentViewer, annotationManager, Annotations } = instance.Core;
+      
+      // assign studentId for the pdf annotation
+      let studentId = 1;
 
       // save button to export xfdf string
       instance.UI.setHeaderItems(header => {
@@ -24,7 +28,7 @@ function App() {
           onClick: async () => {
             const export_xfdf = await annotationManager.exportAnnotations({links:false,widgets:false});
             console.log(export_xfdf);
-            fetch('http://localhost:5000/annotate', {
+            fetch('http://localhost:5000/annotation/add/' + studentId, {
               method: 'POST',
               body: export_xfdf // written to a database in the server
             });
@@ -32,17 +36,23 @@ function App() {
         });
       });
 
+
       // when document is loaded, import annotations to display
       documentViewer.addEventListener('documentLoaded', () => {
         // Get xfdfString from database
-        fetch('http://localhost:5000/getannotation', {
+        fetch('http://localhost:5000/annotation/get/' + studentId, {
           method: 'GET'
         }).then(response => {
-          response.text().then(xfdfString => {
-            if(xfdfString != "") {
+
+          response.text().then(jsonString => {
+
+            if(jsonString != "null") {
+              let xfdfString = JSON.parse(jsonString).string;
               annotationManager.importAnnotations(xfdfString);
+              console.log(xfdfString);
               console.log("Annotations imported successfully!");
             }
+
           });
         });
       });
